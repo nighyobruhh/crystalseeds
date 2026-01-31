@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Crystal Seeds Store</title>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f0f0f0;
+    color: #111;
+}
+
+header {
+    background: #000;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    font-size: 28px;
+    letter-spacing: 2px;
+}
+
+.topbar {
+    text-align: center;
+    margin: 20px;
+}
+
+.add-btn {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.add-btn:hover {
+    background: #444;
+}
+
+.products {
+    max-width: 1100px;
+    margin: 20px auto 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 0 20px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.price {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 8px 0;
+}
+
+.buy-btn {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.buy-btn:hover {
+    background: #444;
+}
+</style>
+</head>
+<body>
+
+<header>CRYSTAL SEEDS STORE</header>
+
+<div class="topbar">
+    <button class="add-btn" onclick="addProduct()">+ New Product</button>
+</div>
+
+<div class="products" id="productList"></div>
+
+<script>
+const defaultProducts = [
+    {
+        name: "Blue Crystal Kit",
+        desc: "Grow a shiny blue crystal at home.",
+        price: 199,
+        img: "https://images.unsplash.com/photo-1581090700227-1e8b9d1fbd0c"
+    },
+    {
+        name: "Red Crystal Kit",
+        desc: "Create a deep red crystal in days.",
+        price: 199,
+        img: "https://images.unsplash.com/photo-1604079628040-94301bb21b91"
+    },
+    {
+        name: "Starter Science Kit",
+        desc: "Best for beginners and students.",
+        price: 299,
+        img: "https://images.unsplash.com/photo-1581091870627-3c6b9f4f8b66"
+    }
+];
+
+// load from localStorage, or use default first time
+let products = JSON.parse(localStorage.getItem("products")) || defaultProducts;
+
+function saveProducts() {
+    localStorage.setItem("products", JSON.stringify(products));
+}
+
+function renderProducts() {
+    const container = document.getElementById("productList");
+    container.innerHTML = "";
+
+    products.forEach((p, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+            <img src="${p.img}" alt="product image">
+            <h3>${p.name}</h3>
+            <p>${p.desc}</p>
+            <div class="price">₹${p.price}</div>
+            <button class="buy-btn" onclick="order('${p.name}', '${p.price}')">Buy</button>
+            <br><br>
+            <button onclick="deleteProduct(${index})" style="background:#ccc;color:#000;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;">
+                Delete
+            </button>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+
+function addProduct() {
+    const name = prompt("Product name:");
+    if (!name) return;
+
+    const desc = prompt("Product description:");
+    if (!desc) return;
+
+    const price = prompt("Price (numbers only):");
+    if (!price) return;
+
+    const img = prompt("Image link (paste URL of image):");
+    if (!img) return;
+
+    products.push({
+        name: name,
+        desc: desc,
+        price: price,
+        img: img
+    });
+
+    saveProducts();   // 🔥 save permanently
+    renderProducts();
+}
+
+function order(name, price) {
+    const text = `Hello, I want to buy ${name} for ₹${price}`;
+
+    const phone1 = "919700081421"; // first number
+    const phone2 = "919855562754"; // second number
+
+    const url1 = `https://wa.me/${phone1}?text=${encodeURIComponent(text)}`;
+    const url2 = `https://wa.me/${phone2}?text=${encodeURIComponent(text)}`;
+
+    const choice = confirm("Press OK to order on Number 1.\nPress Cancel to order on Number 2.");
+
+    if (choice) {
+        window.open(url1, "_blank");
+    } else {
+        window.open(url2, "_blank");
+    }
+}
+
+function deleteProduct(index) {
+    if (confirm("Delete this product?")) {
+        products.splice(index, 1);   // remove from array
+        saveProducts();              // update localStorage
+        renderProducts();            // refresh UI
+    }
+}
+
+
+renderProducts();
+</script>
+
+
+</body>
+</html>
