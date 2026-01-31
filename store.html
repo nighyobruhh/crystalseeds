@@ -92,114 +92,91 @@ header {
 
 <div class="products" id="productList"></div>
 
-<script>
-const defaultProducts = [
-    {
-        name: "Blue Crystal Kit",
-        desc: "Grow a shiny blue crystal at home.",
-        price: 199,
-        img: "https://images.unsplash.com/photo-1581090700227-1e8b9d1fbd0c"
-    },
-    {
-        name: "Red Crystal Kit",
-        desc: "Create a deep red crystal in days.",
-        price: 199,
-        img: "https://images.unsplash.com/photo-1604079628040-94301bb21b91"
-    },
-    {
-        name: "Starter Science Kit",
-        desc: "Best for beginners and students.",
-        price: 299,
-        img: "https://images.unsplash.com/photo-1581091870627-3c6b9f4f8b66"
-    }
-];
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+   
 
-// load from localStorage, or use default first time
-let products = JSON.parse(localStorage.getItem("products")) || defaultProducts;
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-function saveProducts() {
-    localStorage.setItem("products", JSON.stringify(products));
-}
+/* paste your firebaseConfig here */
+const firebaseConfig = {
+  apiKey: "PASTE",
+  authDomain: "PASTE",
+  projectId: "PASTE",
+  storageBucket: "PASTE",
+  messagingSenderId: "PASTE",
+  appId: "PASTE"
+};
 
-function renderProducts() {
-    const container = document.getElementById("productList");
-    container.innerHTML = "";
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-    products.forEach((p, index) => {
+const listEl = document.getElementById("productList");
+const productsCol = collection(db, "products");
+
+async function loadProducts() {
+    listEl.innerHTML = "";
+    const snap = await getDocs(productsCol);
+
+    snap.forEach(docSnap => {
+        const p = docSnap.data();
+        const id = docSnap.id;
+
         const card = document.createElement("div");
         card.className = "card";
-
         card.innerHTML = `
-            <img src="${p.img}" alt="product image">
+            <img src="${p.img}">
             <h3>${p.name}</h3>
             <p>${p.desc}</p>
             <div class="price">₹${p.price}</div>
             <button class="buy-btn" onclick="order('${p.name}', '${p.price}')">Buy</button>
             <br><br>
-            <button onclick="deleteProduct(${index})" style="background:#ccc;color:#000;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;">
-                Delete
-            </button>
+            <button onclick="deleteProduct('${id}')">Delete</button>
         `;
-
-        container.appendChild(card);
+        listEl.appendChild(card);
     });
 }
 
-
-function addProduct() {
+window.addProduct = async function () {
     const name = prompt("Product name:");
     if (!name) return;
-
-    const desc = prompt("Product description:");
+    const desc = prompt("Description:");
     if (!desc) return;
-
-    const price = prompt("Price (numbers only):");
+    const price = prompt("Price:");
     if (!price) return;
-
-    const img = prompt("Image link (paste URL of image):");
+    const img = prompt("Image URL:");
     if (!img) return;
 
-    products.push({
-        name: name,
-        desc: desc,
-        price: price,
-        img: img
-    });
+    await addDoc(productsCol, { name, desc, price, img });
+    loadProducts();
+};
 
-    saveProducts();   // 🔥 save permanently
-    renderProducts();
-}
+window.deleteProduct = async function (id) {
+    await deleteDoc(doc(db, "products", id));
+    loadProducts();
+};
 
-function order(name, price) {
+window.order = function(name, price) {
     const text = `Hello, I want to buy ${name} for ₹${price}`;
-
-    const phone1 = "919700081421"; // first number
-    const phone2 = "919855562754"; // second number
+    const phone1 = "919700081421";
+    const phone2 = "91XXXXXXXXXX";
 
     const url1 = `https://wa.me/${phone1}?text=${encodeURIComponent(text)}`;
     const url2 = `https://wa.me/${phone2}?text=${encodeURIComponent(text)}`;
 
-    const choice = confirm("Press OK to order on Number 1.\nPress Cancel to order on Number 2.");
-
-    if (choice) {
+    if (confirm("OK = number 1, Cancel = number 2")) {
         window.open(url1, "_blank");
     } else {
         window.open(url2, "_blank");
     }
-}
+};
 
-function deleteProduct(index) {
-    if (confirm("Delete this product?")) {
-        products.splice(index, 1);   // remove from array
-        saveProducts();              // update localStorage
-        renderProducts();            // refresh UI
-    }
-}
-
-
-renderProducts();
+loadProducts();
 </script>
 
 
 </body>
 </html>
+
