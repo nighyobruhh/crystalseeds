@@ -175,7 +175,7 @@ function renderCart() {
         itemsDiv.innerHTML += `
             <div>
                 ${item.name} - ₹${item.price}
-              ${isAdmin ? `<button onclick="deleteProduct('${id}')">Delete</button>` : ""}
+              <button onclick="removeCartItem(${index})">X</button>
             </div>
         `;
     });
@@ -221,7 +221,8 @@ async function loadProducts() {
             <button onclick="addToCart('${p.name}', ${p.price})">Add to Cart</button>
             <button class="buy-btn" onclick="order('${p.name}', '${p.price}')">Buy Now</button>
             <br><br>
-            <button onclick="deleteProduct('${id}')">Delete</button>
+            ${isAdmin ? `<button onclick="deleteProduct('${id}')">Delete</button>` : ""}
+
         `;
         listEl.appendChild(card);
     });
