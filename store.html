@@ -86,6 +86,11 @@ header {
 
 <header>CRYSTAL SEEDS STORE</header>
 
+<div style="text-align:center; margin-top:10px;">
+    <button onclick="enterAdmin()">Admin</button>
+</div>
+
+
 <div style="text-align:center; margin:20px;">
     <button onclick="toggleCart()" style="padding:10px 20px;">
         🛒 View Cart
@@ -100,7 +105,7 @@ header {
 </div>
 
 
-<div class="topbar">
+<div class="topbar" style="display:none;">
     <button class="add-btn" onclick="addProduct()">+ New Product</button>
 </div>
 
@@ -123,6 +128,9 @@ const firebaseConfig = {
   appId: "1:340531657190:web:2395a9ecacda48dfcffe27"
 };
 
+let isAdmin = false;
+
+
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 function saveCart() {
@@ -134,6 +142,19 @@ window.addToCart = function(name, price) {
     saveCart();
     alert(name + " added to cart");
 };
+
+window.enterAdmin = function() {
+    const pass = prompt("Enter Admin Password:");
+    if (pass === "1234") { // change password
+        isAdmin = true;
+        alert("Admin Mode ON");
+        loadProducts();
+        document.querySelector(".topbar").style.display = "block";
+    } else {
+        alert("Wrong password");
+    }
+};
+
 
 window.toggleCart = function() {
     const box = document.getElementById("cartBox");
@@ -154,7 +175,7 @@ function renderCart() {
         itemsDiv.innerHTML += `
             <div>
                 ${item.name} - ₹${item.price}
-                <button onclick="removeCartItem(${index})">X</button>
+              ${isAdmin ? `<button onclick="deleteProduct('${id}')">Delete</button>` : ""}
             </div>
         `;
     });
