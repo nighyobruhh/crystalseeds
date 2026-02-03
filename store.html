@@ -86,11 +86,6 @@ header {
 
 <header>CRYSTAL SEEDS STORE</header>
 
-<div style="text-align:center; margin-top:10px;">
-    <button onclick="enterAdmin()">Admin</button>
-</div>
-
-
 <div style="text-align:center; margin:20px;">
     <button onclick="toggleCart()" style="padding:10px 20px;">
         🛒 View Cart
@@ -129,6 +124,14 @@ const firebaseConfig = {
 };
 
 let isAdmin = false;
+
+document.add
+document.addEventListener("keydown", function(e) {
+    // Ctrl + Shift + A
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "a") {
+        enterAdmin();
+    }
+});
 
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
