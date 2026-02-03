@@ -86,6 +86,20 @@ header {
 
 <header>CRYSTAL SEEDS STORE</header>
 
+<div style="text-align:center; margin:20px;">
+    <button onclick="toggleCart()" style="padding:10px 20px;">
+        🛒 View Cart
+    </button>
+</div>
+
+<div id="cartBox" style="display:none; background:#fff; max-width:600px; margin:20px auto; padding:20px; border-radius:10px;">
+    <h3>Your Cart</h3>
+    <div id="cartItems"></div>
+    <h4 id="cartTotal">Total: ₹0</h4>
+    <button onclick="clearCart()">Clear Cart</button>
+</div>
+
+
 <div class="topbar">
     <button class="add-btn" onclick="addProduct()">+ New Product</button>
 </div>
@@ -109,6 +123,58 @@ const firebaseConfig = {
   appId: "1:340531657190:web:2395a9ecacda48dfcffe27"
 };
 
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function saveCart() {
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+window.addToCart = function(name, price) {
+    cart.push({ name, price });
+    saveCart();
+    alert(name + " added to cart");
+};
+
+window.toggleCart = function() {
+    const box = document.getElementById("cartBox");
+    box.style.display = box.style.display === "none" ? "block" : "none";
+    renderCart();
+};
+
+function renderCart() {
+    const itemsDiv = document.getElementById("cartItems");
+    const totalDiv = document.getElementById("cartTotal");
+
+    itemsDiv.innerHTML = "";
+    let total = 0;
+
+    cart.forEach((item, index) => {
+        total += Number(item.price);
+
+        itemsDiv.innerHTML += `
+            <div>
+                ${item.name} - ₹${item.price}
+                <button onclick="removeCartItem(${index})">X</button>
+            </div>
+        `;
+    });
+
+    totalDiv.innerText = "Total: ₹" + total;
+}
+
+window.removeCartItem = function(index) {
+    cart.splice(index, 1);
+    saveCart();
+    renderCart();
+};
+
+window.clearCart = function() {
+    cart = [];
+    saveCart();
+    renderCart();
+};
+
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -131,7 +197,8 @@ async function loadProducts() {
             <h3>${p.name}</h3>
             <p>${p.desc}</p>
             <div class="price">₹${p.price}</div>
-            <button class="buy-btn" onclick="order('${p.name}', '${p.price}')">Buy</button>
+            <button onclick="addToCart('${p.name}', ${p.price})">Add to Cart</button>
+            <button class="buy-btn" onclick="order('${p.name}', '${p.price}')">Buy Now</button>
             <br><br>
             <button onclick="deleteProduct('${id}')">Delete</button>
         `;
@@ -179,6 +246,4 @@ loadProducts();
 
 </body>
 </html>
-
-
 
