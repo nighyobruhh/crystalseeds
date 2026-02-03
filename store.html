@@ -193,7 +193,7 @@ async function loadProducts() {
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
-            <img src="${p.img}">
+            <img src="${p.img || 'https://via.placeholder.com/300x180?text=No+Image'}">
             <h3>${p.name}</h3>
             <p>${p.desc}</p>
             <div class="price">₹${p.price}</div>
